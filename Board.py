@@ -9,6 +9,7 @@ class Board:
         self.pawns = []
         self.players = []
         self.fields = []
+        self.goals = []
 
         #Put the fields on the board
         field = Field(0)
@@ -23,15 +24,17 @@ class Board:
         #Initialize the players
         for i in range(4):
             entry = self.fields[i*13]
-            field = Field(52+i)
+            field = Field(52+i+i*5)
+            self.goals.append(field)
             entry.goal = field
             goal = entry.goal
             player = Player(goal, entry, i) #Add goal and entry
             self.players.append(player)
 
             #Make goal area
-            for j in range(5):
-                next = Field(56+i)
+            for j in range(4):
+                next = Field(53+j +5*i)
+                self.goals.append(next)
                 goal.next = next
                 goal = next
 
@@ -43,8 +46,23 @@ class Board:
             self.players[gibb[i]].add_pawn(pawn)
 
     def play(self):
-        for i in range(len(self.players)):
-            self.play_once(self.players[i])
+        winner = False
+
+        turns = 0
+        while not winner:
+            turns += 1
+            for player in self.players:
+                self.play_once(player)
+                if player.goaled == len(player.pawns):
+                    winner = True
+                pawns = ""
+                for pawn in player.pawns:
+                    pawns += str(pawn.isOn)
+                print(pawns)
+            for player in b.players:
+                print(f"Pieces in goals for {player.id}: {player.goaled}")
+
+        print(f"Turns: {turns}")
 
     def play_once(self,player):
             num = self.die.roll()
@@ -81,7 +99,7 @@ class Board:
         print("Gibbigabb")
         for i in range(len(pawns)):
             if pawns[i].isOn is not None:
-                pawns[i].move(die)
+                pawns[i].move(die, self.players)
                 break
 
         self.print_board()
@@ -104,6 +122,7 @@ class Board:
         """
         i = 49
         j = 48
+        k = 0
         text = "                  "
         for g in range(3):
             text += "["
@@ -125,8 +144,14 @@ class Board:
             else:
                 text += " "
             j -= 1
-            text += "]   " 
-            text += "["
+            text += "]["
+            if len(self.goals[k].pawns) > 0:
+                    for pawn in self.goals[k].pawns:
+                        text += str(pawn.belongsTo.id)
+            else:
+                text += " "
+            k += 1
+            text += "]["
             if len(self.fields[i].pawns) > 0:
                     for pawn in self.fields[i].pawns:
                         text += str(pawn.belongsTo.id)
@@ -164,7 +189,29 @@ class Board:
                 text += str(pawn.belongsTo.id)
         else:
                 text += " "
-        text += "]                                       ["
+        text += "]"
+        k = 15
+        for g in range(5):
+            text += "["
+            if len(self.goals[k].pawns) > 0:
+                    for pawn in self.goals[k].pawns:
+                        text += str(pawn.belongsTo.id)
+            else:
+                text += " "
+            k += 1
+            text += "]"
+        text += "         "
+        k = 9
+        for g in range(5):
+            text += "["
+            if len(self.goals[k].pawns) > 0:
+                    for pawn in self.goals[k].pawns:
+                        text += str(pawn.belongsTo.id)
+            else:
+                text += " "
+            k -= 1
+            text += "]"
+        text += "["
         if len(self.fields[i].pawns) > 0:
             for pawn in self.fields[i].pawns:
                 text += str(pawn.belongsTo.id)
@@ -198,7 +245,9 @@ class Board:
             text += "]"
 
         i += 7
+        k = 14
 
+        print(len(self.goals))
         text += "\n"
         for g in range(5):
             text += "                  ["
@@ -208,8 +257,14 @@ class Board:
             else:
                 text += " "
             j -= 1
-            text += "]   " 
-            text += "["
+            text += "]["
+            if len(self.goals[k].pawns) > 0:
+                    for pawn in self.goals[k].pawns:
+                        text += str(pawn.belongsTo.id)
+            else:
+                text += " "
+            k -= 1
+            text += "]["
             if len(self.fields[i].pawns) > 0:
                     for pawn in self.fields[i].pawns:
                         text += str(pawn.belongsTo.id)
@@ -235,8 +290,7 @@ class Board:
 if __name__ == "__main__":
     b = Board()
 
-    for i in range(40):
-        b.play()
+    b.play()
 
-    for player in b.players:
-        print(player.goaled)
+    #for player in b.players:
+     #   print(f"Pieces in goals for {player.id}: {player.goaled}")

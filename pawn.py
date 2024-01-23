@@ -6,7 +6,7 @@ class Pawn:
         self.isOn = None
         self.goal = False
 
-    def move(self, spaces):
+    def move(self, spaces, players):
         print(self.isOn)
         self.isOn.remove_pawn(self)
         print(self.isOn)
@@ -37,8 +37,17 @@ class Pawn:
             if len(self.isOn.pawns) > 1:
                 for pawn in self.isOn.pawns:
                     if pawn.belongsTo != self.belongsTo:
-                        pawn.isOn = None
-                        self.isOn.remove_pawn(pawn)
+                        start = False
+                        for player in players:
+                            if self.isOn == player.entry and pawn.belongsTo == player:
+                                start = True
+                        if start is False:
+                            pawn.isOn = None
+                            self.isOn.remove_pawn(pawn)
+                        else:
+                            self.isOn.remove_pawn(self)
+                            self.isOn = None
+                            return
 
     def move_out(self):
         self.isOn = self.belongsTo.entry
