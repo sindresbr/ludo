@@ -13,7 +13,8 @@ class Pawn:
         k = 0
         for i in range(spaces):
             print("Les move")
-            if self.isOn is None:
+            if self.isOn.next is None:
+                self.isOn = None
                 self.belongsTo.goaled += 1
                 break
             self.isOn = self.isOn.next
@@ -26,12 +27,16 @@ class Pawn:
         if k > 0:
             self.goal = True
             self.isOn = self.belongsTo.goal
-            k += 1
+            k -= 1
             for i in range(k):
+                print(self.isOn.next)
                 if self.isOn.next is None:
-                    self.goal = True
+                    self.isOn = None
+                    self.belongsTo.goaled += 1
+                    break
                 else:
                     self.isOn = self.isOn.next
+
         if self.isOn is not None:
             self.isOn.add_pawn(self)
             if len(self.isOn.pawns) > 1:
